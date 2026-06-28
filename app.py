@@ -12,6 +12,18 @@ from src.signal_engine import build_signals
 
 ROOT = Path(__file__).resolve().parent
 HISTORY_PATH = ROOT / "reports" / "signal_history.csv"
+REQUIRED_HISTORY_COLUMNS = {"run_id", "symbol", "timestamp_utc", "final_score", "signal"}
+LEGACY_RENAME_MAP = {
+    "equity": "symbol",
+    "token_pair": "tokenized_pair",
+    "equity_price": "reference_price",
+    "token_price": "tokenized_price",
+    "premium_discount_pct": "premium_discount_percent",
+    "spread_pct": "bid_ask_spread_percent",
+    "score": "final_score",
+    "label": "signal",
+    "reason": "notes",
+}
 
 
 def load_config() -> dict:
@@ -23,6 +35,27 @@ def load_config() -> dict:
         return yaml.safe_load(file)
 
 
+def normalize_signal_history(history: pd.DataFrame) -> pd.DataFrame:
+    if history.empty:
+        return history
+
+    normalized = history.rename(columns=LEGACY_RENAME_MAP).copy()
+
+    if "run_id" not in normalized.columns:
+        normalized.insert(0, "run_id", "legacy")
+
+    if "signal" not in normalized.columns and "signal_label" in normalized.columns:
+        normalized["signal"] = normalized["signal_label"]
+
+    if "final_score" in normalized.columns:
+        normalized["final_score"] = pd.to_numeric(normalized["final_score"], errors="coerce")
+
+    if "timestamp_utc" in normalized.columns:
+        normalized["timestamp_utc"] = pd.to_datetime(normalized["timestamp_utc"], errors="coerce")
+
+    return normalized
+
+
 def append_signal_history(signals: pd.DataFrame) -> pd.DataFrame:
     HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
 
@@ -31,19 +64,21 @@ def append_signal_history(signals: pd.DataFrame) -> pd.DataFrame:
     history_rows.insert(0, "run_id", run_id)
 
     if HISTORY_PATH.exists():
-        existing = pd.read_csv(HISTORY_PATH)
+        existing = normalize_signal_history(pd.read_csv(HISTORY_PATH))
         combined = pd.concat([existing, history_rows], ignore_index=True)
     else:
         combined = history_rows
 
-    combined = combined.drop_duplicates(subset=["run_id", "symbol"], keep="last")
+    if {"run_id", "symbol"}.issubset(combined.columns):
+        combined = combined.drop_duplicates(subset=["run_id", "symbol"], keep="last")
+
     combined.to_csv(HISTORY_PATH, index=False)
     return combined
 
 
 def load_signal_history() -> pd.DataFrame:
     if HISTORY_PATH.exists():
-        return pd.read_csv(HISTORY_PATH)
+        return normalize_signal_history(pd.read_csv(HISTORY_PATH))
     return pd.DataFrame()
 
 
@@ -108,7 +143,23 @@ def render_signal_history() -> None:
         st.info("No signal history has been recorded yet. Run a signal report to start building history.")
         return
 
+    missing = REQUIRED_HISTORY_COLUMNS.difference(history.columns)
+    if missing:
+        st.warning(
+            "The existing signal history file uses an older format and cannot be charted yet. "
+            "Run a new signal report to create history in the current format."
+        )
+        st.caption(f"Missing columns: {', '.join(sorted(missing))}")
+        st.dataframe(history, width="stretch")
+        return
+
     history["timestamp_utc"] = pd.to_datetime(history["timestamp_utc"], errors="coerce")
+    history = history.dropna(subset=["timestamp_utc", "symbol"])
+
+    if history.empty:
+        st.info("Signal history exists, but it does not contain usable timestamp and symbol rows yet.")
+        return
+
     history = history.sort_values(["timestamp_utc", "symbol"])
 
     col1, col2, col3 = st.columns(3)
