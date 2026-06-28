@@ -5,14 +5,16 @@ from pathlib import Path
 import pandas as pd
 
 
-EVENT_SIGNALS = {"STRONG_WATCH", "RISK_OFF"}
+EVENT_SIGNALS = None
 
 
 def append_paper_events(signals: pd.DataFrame, path: str | Path) -> pd.DataFrame:
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    events = signals[signals["signal"].isin(EVENT_SIGNALS)].copy()
+    # Early research mode: log every signal row so the dashboard has a complete paper trail.
+    # Later, this can be tightened to only log actionable events such as STRONG_WATCH or RISK_OFF.
+    events = signals.copy()
     if events.empty:
         return pd.read_csv(output_path) if output_path.exists() else pd.DataFrame()
 
