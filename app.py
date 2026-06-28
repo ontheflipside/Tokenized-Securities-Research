@@ -13,6 +13,7 @@ from src.signal_engine import build_signals
 ROOT = Path(__file__).resolve().parent
 HISTORY_PATH = ROOT / "reports" / "signal_history.csv"
 REQUIRED_HISTORY_COLUMNS = {"run_id", "symbol", "timestamp_utc", "final_score", "signal"}
+WATCHLIST_COLUMNS = ["symbol", "name", "tokenized_pair", "category"]
 LEGACY_RENAME_MAP = {
     "equity": "symbol",
     "token_pair": "tokenized_pair",
@@ -33,6 +34,34 @@ def load_config() -> dict:
 
     with selected.open("r", encoding="utf-8") as file:
         return yaml.safe_load(file)
+
+
+def load_watchlist(path: Path) -> pd.DataFrame:
+    if path.exists():
+        watchlist = pd.read_csv(path)
+    else:
+        watchlist = pd.DataFrame(columns=WATCHLIST_COLUMNS)
+
+    for column in WATCHLIST_COLUMNS:
+        if column not in watchlist.columns:
+            watchlist[column] = ""
+
+    return watchlist[WATCHLIST_COLUMNS].fillna("")
+
+
+def save_watchlist(path: Path, watchlist: pd.DataFrame) -> pd.DataFrame:
+    cleaned = watchlist.copy()
+    for column in WATCHLIST_COLUMNS:
+        cleaned[column] = cleaned[column].astype(str).str.strip()
+
+    cleaned = cleaned[cleaned["symbol"] != ""]
+    cleaned["symbol"] = cleaned["symbol"].str.upper()
+    cleaned = cleaned.drop_duplicates(subset=["symbol"], keep="last")
+    cleaned = cleaned.sort_values("symbol")
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    cleaned.to_csv(path, index=False)
+    return cleaned
 
 
 def normalize_signal_history(history: pd.DataFrame) -> pd.DataFrame:
@@ -96,6 +125,36 @@ def run_agent() -> pd.DataFrame:
     append_signal_history(signals)
 
     return signals
+
+
+def render_watchlist_editor(watchlist_path: Path) -> None:
+    st.header("Watchlist")
+    st.caption("Edit the symbols you want included in the next signal run.")
+
+    watchlist = load_watchlist(watchlist_path)
+
+    edited = st.data_editor(
+        watchlist,
+        num_rows="dynamic",
+        width="stretch",
+        key="watchlist_editor",
+        column_config={
+            "symbol": st.column_config.TextColumn("Symbol", required=True),
+            "name": st.column_config.TextColumn("Company / Asset Name"),
+            "tokenized_pair": st.column_config.TextColumn("Tokenized Pair"),
+            "category": st.column_config.TextColumn("Category"),
+        },
+    )
+
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        if st.button("Save Watchlist"):
+            saved = save_watchlist(watchlist_path, edited)
+            st.success(f"Watchlist saved with {len(saved)} symbols.")
+            st.rerun()
+
+    with col2:
+        st.info("Use the blank row at the bottom to add a symbol. Delete a row by selecting it and pressing delete.")
 
 
 def render_latest_signals(signals: pd.DataFrame) -> None:
@@ -232,15 +291,10 @@ def main() -> None:
         else:
             signals = pd.DataFrame()
 
-    st.header("Watchlist")
+    watchlist_tab, latest_tab, history_tab = st.tabs(["Watchlist", "Latest Signals", "Signal History"])
 
-    if watchlist_path.exists():
-        watchlist = pd.read_csv(watchlist_path)
-        st.dataframe(watchlist, width="stretch")
-    else:
-        st.error("Watchlist file not found.")
-
-    latest_tab, history_tab = st.tabs(["Latest Signals", "Signal History"])
+    with watchlist_tab:
+        render_watchlist_editor(watchlist_path)
 
     with latest_tab:
         render_latest_signals(signals)
