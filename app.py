@@ -348,8 +348,12 @@ def render_paper_log() -> None:
 
     if "timestamp_utc" in paper.columns:
         paper["timestamp_utc"] = pd.to_datetime(paper["timestamp_utc"], errors="coerce")
+        paper = paper.sort_values("timestamp_utc", ascending=False)
 
-    col1, col2, col3 = st.columns(3)
+    watch_signals = ["WATCH", "STRONG_WATCH"]
+    risk_signals = ["CAUTION", "RISK_OFF"]
+
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Paper Events", len(paper))
 
     if "symbol" in paper.columns:
@@ -358,27 +362,110 @@ def render_paper_log() -> None:
         col2.metric("Unique Symbols", "N/A")
 
     if "signal" in paper.columns:
-        col3.metric("Signal Types", paper["signal"].nunique())
+        watch_count = int(paper["signal"].isin(watch_signals).sum())
+        risk_count = int(paper["signal"].isin(risk_signals).sum())
+        col3.metric("Watch Events", watch_count)
+        col4.metric("Risk Events", risk_count)
     else:
-        col3.metric("Signal Types", "N/A")
+        col3.metric("Watch Events", "N/A")
+        col4.metric("Risk Events", "N/A")
 
-    if "signal" in paper.columns:
-        st.subheader("Events by Signal Type")
-        signal_counts = paper["signal"].value_counts().reset_index()
-        signal_counts.columns = ["signal", "event_count"]
-        st.dataframe(signal_counts, width="stretch")
-        st.bar_chart(signal_counts.set_index("signal"))
+    st.subheader("Paper Log Filters")
 
-    if "symbol" in paper.columns:
-        st.subheader("Events by Symbol")
-        symbol_counts = paper["symbol"].value_counts().reset_index()
-        symbol_counts.columns = ["symbol", "event_count"]
-        st.dataframe(symbol_counts, width="stretch")
-        st.bar_chart(symbol_counts.set_index("symbol"))
+    filter_col1, filter_col2 = st.columns(2)
+
+    filtered = paper.copy()
+
+    with filter_col1:
+        if "signal" in paper.columns:
+            signal_options = sorted(paper["signal"].dropna().unique())
+            selected_signals = st.multiselect(
+                "Signal type",
+                options=signal_options,
+                default=signal_options,
+                key="paper_signal_filter",
+            )
+            if selected_signals:
+                filtered = filtered[filtered["signal"].isin(selected_signals)]
+
+    with filter_col2:
+        if "symbol" in paper.columns:
+            symbol_options = sorted(paper["symbol"].dropna().unique())
+            selected_symbols = st.multiselect(
+                "Symbol",
+                options=symbol_options,
+                default=symbol_options,
+                key="paper_symbol_filter",
+            )
+            if selected_symbols:
+                filtered = filtered[filtered["symbol"].isin(selected_symbols)]
+
+    if filtered.empty:
+        st.info("No paper events match the current filters.")
+        return
+
+    summary_col1, summary_col2 = st.columns(2)
+
+    with summary_col1:
+        if "signal" in filtered.columns:
+            st.subheader("Events by Signal Type")
+            signal_counts = filtered["signal"].value_counts().reset_index()
+            signal_counts.columns = ["signal", "event_count"]
+            st.dataframe(signal_counts, width="stretch")
+            st.bar_chart(signal_counts.set_index("signal"))
+
+    with summary_col2:
+        if "symbol" in filtered.columns:
+            st.subheader("Events by Symbol")
+            symbol_counts = filtered["symbol"].value_counts().reset_index()
+            symbol_counts.columns = ["symbol", "event_count"]
+            st.dataframe(symbol_counts, width="stretch")
+            st.bar_chart(symbol_counts.set_index("symbol"))
+
+    if {"symbol", "signal"}.issubset(filtered.columns):
+        st.subheader("Repeated Watch Signals")
+        watch_rows = filtered[filtered["signal"].isin(watch_signals)].copy()
+
+        if watch_rows.empty:
+            st.info("No WATCH or STRONG_WATCH events found in the current filter.")
+        else:
+            watch_summary = watch_rows.groupby("symbol").agg(
+                watch_event_count=("signal", "count"),
+                latest_signal=("signal", "first"),
+            )
+
+            if "final_score" in watch_rows.columns:
+                watch_summary["average_score"] = watch_rows.groupby("symbol")["final_score"].mean().round(2)
+                watch_summary["best_score"] = watch_rows.groupby("symbol")["final_score"].max().round(2)
+
+            watch_summary = watch_summary.reset_index().sort_values(
+                "watch_event_count",
+                ascending=False,
+            )
+            st.dataframe(watch_summary, width="stretch")
+
+        st.subheader("Repeated Risk Flags")
+        risk_rows = filtered[filtered["signal"].isin(risk_signals)].copy()
+
+        if risk_rows.empty:
+            st.info("No CAUTION or RISK_OFF events found in the current filter.")
+        else:
+            risk_summary = risk_rows.groupby("symbol").agg(
+                risk_event_count=("signal", "count"),
+                latest_signal=("signal", "first"),
+            )
+
+            if "final_score" in risk_rows.columns:
+                risk_summary["average_score"] = risk_rows.groupby("symbol")["final_score"].mean().round(2)
+                risk_summary["worst_score"] = risk_rows.groupby("symbol")["final_score"].min().round(2)
+
+            risk_summary = risk_summary.reset_index().sort_values(
+                "risk_event_count",
+                ascending=False,
+            )
+            st.dataframe(risk_summary, width="stretch")
 
     st.subheader("Most Recent Paper Events")
-    if "timestamp_utc" in paper.columns:
-        paper = paper.sort_values("timestamp_utc", ascending=False)
 
     display_columns = [
         column
@@ -387,20 +474,25 @@ def render_paper_log() -> None:
             "symbol",
             "signal",
             "final_score",
+            "reference_price",
+            "tokenized_price",
             "premium_discount_percent",
             "bid_ask_spread_percent",
             "notes",
         ]
-        if column in paper.columns
+        if column in filtered.columns
     ]
 
-    st.dataframe(paper[display_columns] if display_columns else paper, width="stretch")
+    if display_columns:
+        st.dataframe(filtered[display_columns], width="stretch")
+    else:
+        st.dataframe(filtered, width="stretch")
 
-    paper_csv = paper.to_csv(index=False).encode("utf-8")
+    paper_csv = filtered.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="Download Paper Log",
+        label="Download Filtered Paper Log",
         data=paper_csv,
-        file_name="paper_trades.csv",
+        file_name="paper_trades_filtered.csv",
         mime="text/csv",
     )
 
