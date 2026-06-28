@@ -222,9 +222,14 @@ def render_signal_history() -> None:
     history = history.sort_values(["timestamp_utc", "symbol"])
 
     col1, col2, col3 = st.columns(3)
+    runs_captured = history["run_id"].nunique()
+
     col1.metric("Historical Rows", len(history))
     col2.metric("Unique Symbols", history["symbol"].nunique())
-    col3.metric("Runs Captured", history["run_id"].nunique())
+    col3.metric("Runs Captured", runs_captured)
+
+    if runs_captured < 2:
+        st.info("Run the signal report at least two times to see a meaningful trend chart.")
 
     symbols = sorted(history["symbol"].dropna().unique())
     selected_symbols = st.multiselect(
