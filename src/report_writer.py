@@ -16,7 +16,7 @@ def write_html(signals: pd.DataFrame, path: str | Path, config: dict[str, Any]) 
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    title = config.get("agent", {}).get("name", "Tokenized Equity Strategy Agent")
+    title = config.get("agent", {}).get("name", "Tokenized Securities Research")
     generated_at = pd.Timestamp.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
     table = signals.to_html(index=False, classes="signals", border=0)
 
