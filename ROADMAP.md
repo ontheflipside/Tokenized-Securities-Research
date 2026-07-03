@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap frames the Tokenized Equity Strategy Agent as an open research project. The priorities are ordered to make the project more credible, testable, and useful to outside contributors.
+This roadmap frames Tokenized Securities Research as an open research project. The priorities are ordered to make the project more credible, testable, and useful to outside contributors.
 
 ## v0.1.0: Public prototype
 
@@ -10,19 +10,19 @@ Status: current public launch baseline.
 - Streamlit dashboard.
 - Configurable watchlist.
 - CSV and HTML signal reports.
-- Paper event logging.
+- Paper research event logging.
 - Signal history table and trend view.
 - Simulated tokenized market metrics.
 
-## v0.2.0: Real tokenized market data
+## v0.2.0: Real tokenized securities market data
 
 Goal: replace simulated tokenized market metrics with provider-based market data.
 
 Planned work:
 
-- Evaluate tokenized equity data providers.
+- Evaluate tokenized securities market data providers.
 - Add provider configuration with safe local credential handling.
-- Pull tokenized bid, ask, last price, volume, and liquidity data.
+- Pull tokenized bid, ask, last price, volume, spread, and liquidity data.
 - Preserve raw market snapshots for auditability.
 - Clearly label stale, missing, or low-confidence market data.
 
@@ -40,7 +40,7 @@ Planned work:
 
 ## v0.4.0: Dashboard and research workflow
 
-Goal: make the tool easier for researchers and finance professionals to use.
+Goal: make the platform easier for researchers and finance professionals to use.
 
 Planned work:
 
@@ -64,8 +64,8 @@ Planned work:
 
 ## Future research areas
 
-- Multi-provider tokenized equity data comparison.
-- Arbitrage alerting research without automated execution.
+- Multi-provider tokenized securities market data comparison.
+- Price dislocation alerting research without automated execution.
 - Stablecoin settlement implications.
 - After-hours dislocation studies.
 - Liquidity risk scoring.
@@ -73,4 +73,4 @@ Planned work:
 
 ## Non-goals for the current phase
 
-The current project will not include live trade execution, brokerage integration, exchange account integration, or automated order placement. Those features should not be considered until the research signal quality, data integrity, and risk controls are substantially more mature.
+The current project will not include live execution, brokerage integration, exchange account integration, or automated order placement. Those features should not be considered until the research signal quality, data integrity, and risk controls are substantially more mature.
