@@ -7,12 +7,12 @@ def write_reports(rows: list[dict], report_dir: Path) -> tuple[Path, Path]:
 
     df = pd.DataFrame(rows)
 
-    # --- CURRENT SNAPSHOT (no change) ---
+    # --- CURRENT SNAPSHOT ---
     csv_path = report_dir / "latest_signals.csv"
     html_path = report_dir / "latest_signals.html"
     df.to_csv(csv_path, index=False)
 
-    # --- NEW: HISTORY FILE ---
+    # --- HISTORY FILE ---
     history_path = report_dir / "signal_history.csv"
 
     if history_path.exists():
@@ -23,12 +23,12 @@ def write_reports(rows: list[dict], report_dir: Path) -> tuple[Path, Path]:
 
     combined_df.to_csv(history_path, index=False)
 
-    # --- HTML OUTPUT (no change) ---
+    # --- HTML OUTPUT ---
     html = df.to_html(index=False, border=0)
     html_doc = f"""
     <html>
       <head>
-        <title>Tokenized Equity Strategy Agent</title>
+        <title>Tokenized Securities Research</title>
         <style>
           body {{ font-family: Arial, sans-serif; margin: 30px; }}
           table {{ border-collapse: collapse; width: 100%; }}
@@ -38,8 +38,8 @@ def write_reports(rows: list[dict], report_dir: Path) -> tuple[Path, Path]:
         </style>
       </head>
       <body>
-        <h1>Tokenized Equity Strategy Agent</h1>
-        <p>Latest signal output. Version one is alerting and paper trading only.</p>
+        <h1>Tokenized Securities Research</h1>
+        <p>Latest research signal output. Version one is alerting and paper research only.</p>
         {html}
       </body>
     </html>
