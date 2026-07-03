@@ -1,32 +1,32 @@
-# Tokenized Equity Strategy Agent
+# Tokenized Securities Research
 
-An early stage research dashboard and signal engine for studying tokenized equity market behavior.
+An early stage open-source research platform for studying tokenized securities, market structure, liquidity, pricing dislocations, and AI-assisted market intelligence.
 
-This project is designed to compare tokenized equity instruments against their underlying public equity references, generate structured watch signals, and preserve paper trading events for later analysis. It is intentionally built as a research and alerting workflow first. It does not place trades, execute orders, or provide investment advice.
+This project is designed to compare tokenized securities against their underlying or reference assets, generate structured research signals, and preserve paper research events for later analysis. It is intentionally built as a research and alerting workflow first. It does not place trades, execute orders, or provide investment advice.
 
 ## Current status
 
 Prototype / version 0.1.0.
 
-The current implementation includes a local signal engine, configurable watchlist, generated CSV and HTML reports, paper event logging, and a Streamlit dashboard. Tokenized market metrics are currently simulated until a reliable live tokenized market data source is connected.
+The current implementation includes a local signal engine, configurable watchlist, generated CSV and HTML reports, paper event logging, and a Streamlit dashboard. Tokenized market metrics are currently simulated until a reliable live tokenized securities market data source is connected.
 
 ## Why this matters
 
-Tokenized equities may trade on different market rails than traditional listed equities. They can have different liquidity, spreads, trading hours, price dislocations, and execution risks. The purpose of this project is to study those differences in a repeatable way before any live execution logic is considered.
+Tokenized securities may trade on different market rails than traditional listed securities. They can have different liquidity, spreads, trading hours, price dislocations, and execution risks. The purpose of this project is to study those differences in a repeatable way before any live execution logic is considered.
 
-The research thesis is simple: if tokenized equity markets develop real liquidity, useful signals may come from market structure, premium or discount behavior, liquidity depth, and price dislocation rather than ordinary stock picking.
+The research thesis is simple: if tokenized securities markets develop real liquidity, useful signals may come from market structure, premium or discount behavior, liquidity depth, and price dislocation rather than ordinary security selection.
 
 ## What it does
 
-The agent monitors a configurable watchlist of tokenized equity pairs, such as `AAPLx/USD`, `TSLAx/USD`, and `NVDAx/USD`, compares them against reference equity data, and produces a signal report.
+The platform monitors a configurable watchlist of tokenized security pairs, such as tokenized equity pairs, compares them against reference market data, and produces a research signal report.
 
 The signal engine currently focuses on:
 
-1. Tokenized equity premium or discount versus the underlying stock.
-2. Order book imbalance on the tokenized market.
+1. Tokenized security premium or discount versus the reference asset.
+2. Order book imbalance in the tokenized market.
 3. Liquidity depth and estimated slippage.
 4. Risk controls, including maximum position size, spread limits, and stop thresholds.
-5. Paper signal logging for future performance review.
+5. Paper research event logging for future performance review.
 
 ## What it does not do
 
@@ -94,7 +94,7 @@ streamlit run app.py
 
 ## Outputs
 
-The agent creates local report files under `reports/`:
+The platform creates local report files under `reports/`:
 
 ```text
 reports/latest_signals.csv
@@ -131,7 +131,7 @@ See [ROADMAP.md](ROADMAP.md) for the development plan.
 
 Near-term priorities include:
 
-- Connect a real tokenized market data provider.
+- Connect a real tokenized securities market data provider.
 - Improve premium and discount calculations.
 - Add historical backtesting.
 - Add signal performance tracking.
