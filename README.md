@@ -4,6 +4,44 @@ An early stage open-source research platform for studying tokenized securities, 
 
 This project is designed to compare tokenized securities against their underlying or reference assets, generate structured research signals, and preserve paper research events for later analysis. It is intentionally built as a research and alerting workflow first. It does not place trades, execute orders, or provide investment advice.
 
+## Quick start
+
+The easiest way to try the project is to download it from GitHub and run the dashboard launcher for your operating system.
+
+### Download the project
+
+1. Click the green **Code** button on this GitHub page.
+2. Click **Download ZIP**.
+3. Unzip the file.
+4. Open the project folder on your computer.
+
+### Windows
+
+Double-click:
+
+```text
+run_dashboard_windows.bat
+```
+
+Or run it from PowerShell:
+
+```powershell
+.\run_dashboard_windows.bat
+```
+
+### Mac or Linux
+
+Run:
+
+```bash
+chmod +x run_dashboard.sh
+./run_dashboard.sh
+```
+
+The launcher will create a local Python environment, install the required packages, create a local config file if needed, and start the Streamlit dashboard.
+
+For a more detailed beginner guide, see [RUN_PROJECT.md](RUN_PROJECT.md).
+
 ## Current status
 
 Prototype / version 0.1.0.
@@ -57,10 +95,12 @@ This project does not:
 │   ├── report_writer.py            # CSV and HTML output
 │   └── signal_engine.py            # Signal scoring logic
 ├── requirements.txt
+├── run_dashboard_windows.bat       # Windows dashboard launcher
+├── run_dashboard.sh                # Mac and Linux dashboard launcher
 └── README.md
 ```
 
-## Setup
+## Manual setup
 
 Create a virtual environment and install the requirements.
 
@@ -86,7 +126,7 @@ copy configs\config.example.yaml configs\config.yaml
 python scripts/run_agent.py
 ```
 
-## Run the dashboard
+## Run the dashboard manually
 
 ```bash
 streamlit run app.py
