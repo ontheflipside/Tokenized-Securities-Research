@@ -4,6 +4,16 @@ An early stage open-source research platform for studying tokenized securities, 
 
 This project is designed to compare tokenized securities against their underlying or reference assets, generate structured research signals, and preserve paper research events for later analysis. It is intentionally built as a research and alerting workflow first. It does not place trades, execute orders, or provide investment advice.
 
+## Public research preview
+
+This is the first public version of the project: **v0.1.0 Public Research Preview**.
+
+The current release is intentionally early. The goal is to make the project visible, invite feedback, and improve the research framework in public over the coming weeks. Future versions will expand the market data layer, backtesting, signal quality measurement, dashboard design, and AI-assisted market commentary.
+
+Live app: https://ts-ai-research.streamlit.app/
+
+Version history: see [CHANGELOG.md](CHANGELOG.md).
+
 ## Quick start
 
 The easiest way to try the project is to download it from GitHub and run the dashboard launcher for your operating system.
