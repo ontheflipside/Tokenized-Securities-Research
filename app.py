@@ -138,14 +138,11 @@ def render_landing_section() -> None:
         Tokenized assets may create new market behavior that does not fit neatly into traditional equity research.
         As securities, funds, real-world assets, and settlement rails move closer to blockchain infrastructure,
         researchers will need tools that can compare traditional market references with tokenized representations.
-        """
-    )
 
-    st.markdown("### Why this matters")
-    st.write(
-        "Tokenization may change how assets are issued, priced, transferred, settled, and analyzed. "
-        "That shift could create new forms of liquidity fragmentation, premium and discount behavior, "
-        "cross-market pricing differences, and blockchain-native data signals."
+        Tokenization may change how assets are issued, priced, transferred, settled, and analyzed. That shift
+        could create new forms of liquidity fragmentation, premium and discount behavior, cross-market pricing
+        differences, and blockchain-native data signals.
+        """
     )
 
     badge_col1, badge_col2, badge_col3, badge_col4 = st.columns(4)
