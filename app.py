@@ -128,69 +128,78 @@ def run_agent() -> pd.DataFrame:
 
 
 def render_landing_section() -> None:
-    st.title("Tokenized Securities Research")
-    st.subheader("AI-powered market intelligence for the next generation of capital markets.")
+    st.title("Tokenized Capital Markets Research")
+    st.subheader("Researching how tokenization, blockchain infrastructure, and AI may reshape market analysis.")
 
     st.markdown(
         """
-        As traditional securities begin moving onto blockchain infrastructure, investors and researchers
-        will need new ways to analyze liquidity, pricing behavior, market structure, and settlement dynamics.
+        This is not a stock screener. It is a forward-looking research platform focused on **tokenized analysis**.
 
-        **Tokenized Securities Research** is an open-source research platform exploring how artificial
-        intelligence can help analyze the convergence of traditional finance and blockchain-based markets.
+        Tokenized assets may create new market behavior that does not fit neatly into traditional equity research.
+        As securities, funds, real-world assets, and settlement rails move closer to blockchain infrastructure,
+        researchers will need tools that can compare traditional market references with tokenized representations.
         """
     )
 
-    badge_col1, badge_col2, badge_col3, badge_col4 = st.columns(4)
-    badge_col1.metric("Focus", "AI Research")
-    badge_col2.metric("Market Lens", "Blockchain")
-    badge_col3.metric("Reference", "Capital Markets")
-    badge_col4.metric("Version", "v0.1")
+    st.markdown("### Why this matters")
+    st.write(
+        "Tokenization may change how assets are issued, priced, transferred, settled, and analyzed. "
+        "That shift could create new forms of liquidity fragmentation, premium and discount behavior, "
+        "cross-market pricing differences, and blockchain-native data signals."
+    )
 
-    st.markdown("### What this platform does")
+    badge_col1, badge_col2, badge_col3, badge_col4 = st.columns(4)
+    badge_col1.metric("Research Focus", "Tokenized Analysis")
+    badge_col2.metric("Market View", "Traditional + On-Chain")
+    badge_col3.metric("Current Stage", "Public Preview")
+    badge_col4.metric("Data Mode", "Simulated")
+
+    st.markdown("### Research areas")
 
     col1, col2 = st.columns(2)
     with col1:
-        st.write("✓ Compares tokenized securities with traditional market references")
-        st.write("✓ Studies pricing differences and market structure")
-        st.write("✓ Tracks premium and discount behavior")
+        st.write("✓ Tokenized securities and tokenized equity references")
+        st.write("✓ Premium and discount behavior")
+        st.write("✓ Liquidity and spread characteristics")
+        st.write("✓ Blockchain market structure")
     with col2:
-        st.write("✓ Reviews liquidity and spread characteristics")
-        st.write("✓ Generates research signals")
-        st.write("✓ Preserves historical research results")
+        st.write("✓ Stablecoin settlement implications")
+        st.write("✓ Real-world asset market frameworks")
+        st.write("✓ Cross-market pricing signals")
+        st.write("✓ AI-assisted tokenized market research")
 
     st.info(
-        "Current status: v0.1 Public Research Preview. This release demonstrates the research framework "
-        "and user interface. Current market data is simulated while live data integrations and additional "
-        "analytics are under development."
+        "Version 0.1 is a foundation release. It demonstrates the research framework and interface using simulated "
+        "tokenized market data while live data integrations, validation tools, and additional analytics are developed."
     )
 
     st.markdown("### Research vision")
     st.write(
-        "Over the next decade, tokenization may change how securities are issued, analyzed, transferred, "
-        "and settled. The purpose of this project is to explore those changes early by combining AI, "
-        "quantitative research, and blockchain market analysis."
+        "The long-term objective is to build a public research platform for understanding tokenized capital markets "
+        "before they become mainstream. Tokenized securities are the first application. The broader focus is the "
+        "future architecture of markets as traditional finance and blockchain infrastructure converge."
     )
 
 
 def render_sidebar(watchlist_path: Path) -> bool:
     st.sidebar.header("Research Controls")
-    st.sidebar.caption("Public research preview v0.1")
+    st.sidebar.caption("v0.1 foundation release")
 
     st.sidebar.markdown("**Current Capabilities**")
-    st.sidebar.write("✓ Research universe")
+    st.sidebar.write("✓ Tokenized research universe")
     st.sidebar.write("✓ Signal engine")
     st.sidebar.write("✓ Signal history")
     st.sidebar.write("✓ Research journal")
 
     st.sidebar.markdown("**Coming in future versions**")
-    st.sidebar.write("• Live market data")
+    st.sidebar.write("• Live tokenized market data")
+    st.sidebar.write("• Data quality scoring")
     st.sidebar.write("• Backtesting")
-    st.sidebar.write("• AI commentary")
+    st.sidebar.write("• AI market commentary")
     st.sidebar.write("• Market structure analytics")
 
     st.sidebar.divider()
-    st.sidebar.write("Watchlist file:")
+    st.sidebar.write("Universe file:")
     st.sidebar.code(str(watchlist_path))
     st.sidebar.write("History file:")
     st.sidebar.code(str(HISTORY_PATH))
@@ -198,17 +207,17 @@ def render_sidebar(watchlist_path: Path) -> bool:
     st.sidebar.code(str(PAPER_LOG_PATH))
 
     st.sidebar.divider()
-    return st.sidebar.button("Run Market Research")
+    return st.sidebar.button("Run Tokenized Analysis")
 
 
 def render_research_universe(watchlist_path: Path) -> None:
-    st.header("Research Universe")
-    st.caption("Select the securities and tokenized pairs included in the research run.")
+    st.header("Tokenized Research Universe")
+    st.caption("Select the traditional references and tokenized pairs included in the research run.")
 
     watchlist = load_watchlist(watchlist_path)
 
     metric_col1, metric_col2, metric_col3 = st.columns(3)
-    metric_col1.metric("Securities", len(watchlist))
+    metric_col1.metric("Reference Assets", len(watchlist))
     metric_col2.metric("Tokenized Pairs", int((watchlist["tokenized_pair"].astype(str).str.strip() != "").sum()))
     metric_col3.metric("Framework", "Hybrid")
 
@@ -218,8 +227,8 @@ def render_research_universe(watchlist_path: Path) -> None:
         width="stretch",
         key="watchlist_editor",
         column_config={
-            "symbol": st.column_config.TextColumn("Symbol", required=True),
-            "name": st.column_config.TextColumn("Security / Asset Name"),
+            "symbol": st.column_config.TextColumn("Reference Symbol", required=True),
+            "name": st.column_config.TextColumn("Asset / Security Name"),
             "tokenized_pair": st.column_config.TextColumn("Tokenized Pair"),
             "category": st.column_config.TextColumn("Category"),
         },
@@ -229,19 +238,19 @@ def render_research_universe(watchlist_path: Path) -> None:
     with col1:
         if st.button("Save Universe"):
             saved = save_watchlist(watchlist_path, edited)
-            st.success(f"Research universe saved with {len(saved)} symbols.")
+            st.success(f"Research universe saved with {len(saved)} references.")
             st.rerun()
 
     with col2:
-        st.info("Use the blank row at the bottom to add a symbol. Delete a row by selecting it and pressing delete.")
+        st.info("Use the blank row at the bottom to add a reference asset or tokenized pair.")
 
 
 def render_market_signals(signals: pd.DataFrame) -> None:
-    st.header("Market Signals")
-    st.caption("Review current research signals across the selected research universe.")
+    st.header("Tokenized Market Signals")
+    st.caption("Review research signals across traditional references and simulated tokenized market conditions.")
 
     if signals.empty:
-        st.info("No signal report found yet. Click 'Run Market Research' in the sidebar.")
+        st.info("No signal report found yet. Click 'Run Tokenized Analysis' to generate a research report.")
         return
 
     col1, col2, col3, col4 = st.columns(4)
@@ -293,7 +302,7 @@ def render_market_signals(signals: pd.DataFrame) -> None:
         return
 
     st.subheader("Signal Detail")
-    selected_symbol = st.selectbox("Select a symbol to review", options=filtered["symbol"].tolist())
+    selected_symbol = st.selectbox("Select a reference asset to review", options=filtered["symbol"].tolist())
     selected_row = filtered[filtered["symbol"] == selected_symbol].iloc[0]
 
     detail_col1, detail_col2, detail_col3, detail_col4 = st.columns(4)
@@ -317,7 +326,7 @@ def render_signal_history() -> None:
     history = load_signal_history()
 
     if history.empty:
-        st.info("No signal history has been recorded yet. Run Market Research to start building history.")
+        st.info("No signal history has been recorded yet. Run Tokenized Analysis to start building history.")
         return
 
     missing = REQUIRED_HISTORY_COLUMNS.difference(history.columns)
@@ -338,11 +347,11 @@ def render_signal_history() -> None:
 
     col1, col2, col3 = st.columns(3)
     col1.metric("Historical Rows", len(history))
-    col2.metric("Unique Symbols", history["symbol"].nunique())
+    col2.metric("Unique References", history["symbol"].nunique())
     col3.metric("Runs Captured", history["run_id"].nunique())
 
     symbols = sorted(history["symbol"].dropna().unique())
-    selected_symbols = st.multiselect("Select symbols for history view", options=symbols, default=symbols)
+    selected_symbols = st.multiselect("Select references for history view", options=symbols, default=symbols)
     filtered = history[history["symbol"].isin(selected_symbols)] if selected_symbols else history
 
     st.subheader("Score Trend")
@@ -363,10 +372,10 @@ def render_signal_history() -> None:
 
 def render_research_journal() -> None:
     st.header("Research Journal")
-    st.caption("Review paper research events generated by the signal engine.")
+    st.caption("Review research events generated by the signal engine.")
 
     if not PAPER_LOG_PATH.exists():
-        st.info("No research journal found yet. Run Market Research to create paper research events.")
+        st.info("No research journal found yet. Run Tokenized Analysis to create research events.")
         return
 
     paper = pd.read_csv(PAPER_LOG_PATH)
@@ -384,7 +393,7 @@ def render_research_journal() -> None:
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Events", len(paper))
-    col2.metric("Unique Symbols", paper["symbol"].nunique() if "symbol" in paper.columns else "N/A")
+    col2.metric("Unique References", paper["symbol"].nunique() if "symbol" in paper.columns else "N/A")
 
     if "signal" in paper.columns:
         col3.metric("Watch Events", int(paper["signal"].isin(watch_signals).sum()))
@@ -406,7 +415,7 @@ def render_research_journal() -> None:
     with filter_col2:
         if "symbol" in paper.columns:
             symbol_options = sorted(paper["symbol"].dropna().unique())
-            selected_symbols = st.multiselect("Symbol", options=symbol_options, default=symbol_options, key="journal_symbol_filter")
+            selected_symbols = st.multiselect("Reference", options=symbol_options, default=symbol_options, key="journal_symbol_filter")
             if selected_symbols:
                 filtered = filtered[filtered["symbol"].isin(selected_symbols)]
 
@@ -442,7 +451,7 @@ def render_research_journal() -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Tokenized Securities Research", layout="wide")
+    st.set_page_config(page_title="Tokenized Capital Markets Research", layout="wide")
 
     config = load_config()
     watchlist_path = ROOT / config["inputs"]["watchlist_path"]
@@ -452,20 +461,20 @@ def main() -> None:
 
     main_run_col, note_col = st.columns([1, 2])
     with main_run_col:
-        run_from_main = st.button("Run Market Research", type="primary")
+        run_from_main = st.button("Run Tokenized Analysis", type="primary")
     with note_col:
-        st.caption("Run the research engine, then review results in the tabs below.")
+        st.caption("Run the research engine, then review tokenized analysis in the tabs below.")
 
     if run_requested or run_from_main:
-        with st.spinner("Running research engine..."):
+        with st.spinner("Running tokenized analysis engine..."):
             signals = run_agent()
-        st.success("Research report generated and added to signal history.")
+        st.success("Tokenized analysis generated and added to signal history.")
     else:
         latest_path = ROOT / config["outputs"]["latest_signals_csv"]
         signals = pd.read_csv(latest_path) if latest_path.exists() else pd.DataFrame()
 
     universe_tab, signals_tab, history_tab, journal_tab = st.tabs(
-        ["Research Universe", "Market Signals", "Signal History", "Research Journal"]
+        ["Tokenized Universe", "Tokenized Signals", "Signal History", "Research Journal"]
     )
 
     with universe_tab:
